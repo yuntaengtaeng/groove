@@ -1,6 +1,6 @@
 import { Image } from 'react-native';
 
-type Props = {
+export type Props = {
   url: string;
 };
 
