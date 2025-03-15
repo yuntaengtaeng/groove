@@ -3,13 +3,41 @@ import { View } from 'react-native';
 import { RootStackParamList } from './src/navigation';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import List from './src/navigation/screens/List';
-import Detail from './src/navigation/screens/Detail';
+import List from './src/screens/List';
+import Detail from './src/screens/Detail';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import useStore from './src/store';
+import { useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { shortsData } from './src/dummy';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  const { shortList, setShortList } = useStore();
+
+  useEffect(() => {
+    const loadShortList = async () => {
+      const savedList = await AsyncStorage.getItem('shortList');
+
+      if (savedList) {
+        setShortList(JSON.parse(savedList));
+      } else {
+        setShortList(shortsData);
+      }
+    };
+
+    loadShortList();
+  }, [setShortList]);
+
+  useEffect(() => {
+    const saveShortList = async () => {
+      await AsyncStorage.setItem('shortList', JSON.stringify(shortList));
+    };
+
+    saveShortList();
+  }, [shortList]);
+
   return (
     <SafeAreaProvider>
       <View style={{ flex: 1 }}>
