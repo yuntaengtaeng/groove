@@ -1,3 +1,10 @@
+export interface Comment {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: Date;
+}
+
 export interface Short {
   id: string;
   title: string;
@@ -23,10 +30,5 @@ export interface Short {
   views: number;
   shares: number;
   publishedAt: Date;
-  comments: {
-    id: string;
-    author: string;
-    content: string;
-    createdAt: Date;
-  }[];
+  comments: Comment[];
 }
