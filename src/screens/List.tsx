@@ -12,22 +12,26 @@ const List = ({ navigation, route }: ListProps) => {
   const { bottom } = useSafeAreaInsets();
 
   return (
-    <FlatList
-      data={shortList}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <VideoItem
-          {...item}
-          onPress={() => {
-            navigation.navigate('Detail', {
-              id: item.id,
-            });
-          }}
+    <>
+      {shortList.length && (
+        <FlatList
+          data={shortList}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <VideoItem
+              {...item}
+              onPress={() => {
+                navigation.navigate('Detail', {
+                  id: item.id,
+                });
+              }}
+            />
+          )}
+          contentContainerStyle={{ gap: 16 }}
+          ListFooterComponent={<View style={{ marginBottom: bottom }} />}
         />
       )}
-      contentContainerStyle={{ gap: 16 }}
-      ListFooterComponent={<View style={{ marginBottom: bottom }} />}
-    />
+    </>
   );
 };
 
