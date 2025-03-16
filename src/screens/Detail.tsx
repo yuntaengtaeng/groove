@@ -1,4 +1,4 @@
-import { View, StyleSheet, Alert, Text } from 'react-native';
+import { View, Alert, Text } from 'react-native';
 import { RootStackParamList } from '../navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
@@ -15,12 +15,14 @@ import { WebVTTParser } from 'webvtt-parser';
 import LoadingView from '../components/view/LoadingView';
 import ErrorView from '../components/view/ErrorView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useScreenOrientationStore from '../store/orientationStore';
 
 export type DetailProps = NativeStackScreenProps<RootStackParamList, 'Detail'>;
 
 const Detail = ({ navigation, route }: DetailProps) => {
   const id = route.params.id;
-  const { bottom } = useSafeAreaInsets();
+  const { bottom, top } = useSafeAreaInsets();
+  const { isPortrait } = useScreenOrientationStore();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['100%'], []);
@@ -110,8 +112,12 @@ const Detail = ({ navigation, route }: DetailProps) => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View
         style={{
-          flex: 0.6,
+          flex: isPortrait ? 0.6 : 1,
           backgroundColor: 'black',
+          ...(isPortrait && {
+            paddingTop: top,
+            paddingBottom: bottom,
+          }),
         }}
       >
         <VideoView
@@ -123,61 +129,67 @@ const Detail = ({ navigation, route }: DetailProps) => {
         />
       </View>
 
-      <View
-        style={{
-          flex: 0.4,
-          padding: 16,
-          gap: 8,
-        }}
-      >
-        {!!currentSubtitle && (
-          <Text style={{ textAlign: 'center' }}>🔊 {currentSubtitle}</Text>
-        )}
-        <PostInfo
-          title={short.title}
-          tags={short.tags}
-          description={short.description}
-        />
-        <UserProfile url={short.author.avatarURL} name={short.author.name} />
-
-        <EngagementStats
-          comments={short.comments}
-          likes={short.likes}
-          views={short.views}
-          shares={short.shares}
-          onCommentHandler={() => {
-            bottomSheetRef.current?.snapToIndex(1);
-          }}
-          onLikeHandler={() => {
-            setLike(id);
-          }}
-        />
-      </View>
-
-      <BottomSheet
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-        index={-1}
-        enablePanDownToClose={true}
-        keyboardBehavior="fillParent"
-        containerStyle={{
-          paddingBottom: bottom,
-        }}
-      >
-        <BottomSheetView style={{ flex: 1 }}>
-          <CommentSection
-            comments={short.comments}
-            onCommentInputHandler={(newComment) => {
-              if (!newComment) {
-                Alert.alert('댓글을 입력해주세요!');
-                return;
-              }
-
-              setComment(id, newComment);
+      {isPortrait && (
+        <>
+          <View
+            style={{
+              flex: 0.4,
+              padding: 16,
+              gap: 8,
             }}
-          />
-        </BottomSheetView>
-      </BottomSheet>
+          >
+            {!!currentSubtitle && (
+              <Text style={{ textAlign: 'center' }}>🔊 {currentSubtitle}</Text>
+            )}
+            <PostInfo
+              title={short.title}
+              tags={short.tags}
+              description={short.description}
+            />
+            <UserProfile
+              url={short.author.avatarURL}
+              name={short.author.name}
+            />
+
+            <EngagementStats
+              comments={short.comments}
+              likes={short.likes}
+              views={short.views}
+              shares={short.shares}
+              onCommentHandler={() => {
+                bottomSheetRef.current?.snapToIndex(1);
+              }}
+              onLikeHandler={() => {
+                setLike(id);
+              }}
+            />
+          </View>
+          <BottomSheet
+            ref={bottomSheetRef}
+            snapPoints={snapPoints}
+            index={-1}
+            enablePanDownToClose={true}
+            keyboardBehavior="fillParent"
+            containerStyle={{
+              paddingBottom: bottom,
+            }}
+          >
+            <BottomSheetView style={{ flex: 1 }}>
+              <CommentSection
+                comments={short.comments}
+                onCommentInputHandler={(newComment) => {
+                  if (!newComment) {
+                    Alert.alert('댓글을 입력해주세요!');
+                    return;
+                  }
+
+                  setComment(id, newComment);
+                }}
+              />
+            </BottomSheetView>
+          </BottomSheet>
+        </>
+      )}
     </GestureHandlerRootView>
   );
 };

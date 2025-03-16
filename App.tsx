@@ -11,12 +11,17 @@ import { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { shortsData } from './src/dummy';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import useScreenOrientation from './src/hooks/useScreenOrientation';
+import useScreenOrientationStore from './src/store/orientationStore';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const queryClient = new QueryClient();
 
 export default function App() {
   const { shortList, setShortList } = useStore();
+  const { isPortrait } = useScreenOrientationStore();
+
+  useScreenOrientation();
 
   useEffect(() => {
     const loadShortList = async () => {
@@ -48,7 +53,13 @@ export default function App() {
           <NavigationContainer>
             <Stack.Navigator initialRouteName="List">
               <Stack.Screen name="List" component={List} />
-              <Stack.Screen name="Detail" component={Detail} />
+              <Stack.Screen
+                name="Detail"
+                component={Detail}
+                options={{
+                  headerShown: isPortrait,
+                }}
+              />
             </Stack.Navigator>
           </NavigationContainer>
         </View>
