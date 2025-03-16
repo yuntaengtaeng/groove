@@ -3,6 +3,7 @@ import { Short } from '../../types';
 
 type Props = Pick<Short, 'comments' | 'likes' | 'views' | 'shares'> & {
   onCommentHandler: () => void;
+  onLikeHandler: () => void;
 };
 
 const EngagementStats = ({
@@ -11,6 +12,7 @@ const EngagementStats = ({
   views,
   shares,
   onCommentHandler,
+  onLikeHandler,
 }: Props) => {
   return (
     <View style={{ gap: 8 }}>
@@ -30,13 +32,15 @@ const EngagementStats = ({
           gap: 16,
         }}
       >
-        <Text
-          style={{
-            fontSize: 14,
-          }}
-        >
-          ❤️ 좋아요 {likes}
-        </Text>
+        <Pressable onPress={onLikeHandler}>
+          <Text
+            style={{
+              fontSize: 14,
+            }}
+          >
+            ❤️ 좋아요 {likes}
+          </Text>
+        </Pressable>
         <Text
           style={{
             fontSize: 14,
