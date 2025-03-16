@@ -5,6 +5,8 @@ interface Store {
   shortList: Short[];
   setShortList: (shorts: Short[]) => void;
   setComment: (id: string, comment: string) => void;
+  setView: (id: string) => void;
+  setLike: (id: string) => void;
 }
 
 const useStore = create<Store>((set) => ({
@@ -25,6 +27,34 @@ const useStore = create<Store>((set) => ({
                 createdAt: new Date(),
               },
             ],
+          };
+        }
+        return short;
+      });
+      return { shortList: updatedShortList };
+    }),
+
+  setView: (id: string) =>
+    set((state) => {
+      const updatedShortList = state.shortList.map((short) => {
+        if (short.id === id) {
+          return {
+            ...short,
+            views: short.views + 1,
+          };
+        }
+        return short;
+      });
+      return { shortList: updatedShortList };
+    }),
+
+  setLike: (id: string) =>
+    set((state) => {
+      const updatedShortList = state.shortList.map((short) => {
+        if (short.id === id) {
+          return {
+            ...short,
+            likes: short.likes + 1,
           };
         }
         return short;
